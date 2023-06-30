@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Generador de Equipos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    .sobrantes-table {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center">Generador de Equipos</h1>
+
+    <div class="form-group">
+      <label for="numJugadores">Cantidad de jugadores:</label>
+      <input type="number" id="numJugadores" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="nombresJugadores">Nombres de los jugadores (separados por coma):</label>
+      <input type="text" id="nombresJugadores" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <div class="row justify-content-center">
+        <div class="col-auto">
+          <button class="btn btn-secondary" onclick="cargarDatos('champios')">Champios</button>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-secondary" onclick="cargarDatos('mundial')">Mundial</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group text-center">
+      <button class="btn btn-primary" onclick="generarEquipos()">Generar Equipos</button>
+    </div>
+
+    <div class="table-responsive">
+      <table id="tablaEquipos" class="table table-striped">
+        <thead>
+          <tr>
+            <th>Jugador</th>
+            <th>Equipos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Los equipos asignados a los jugadores se agregarán aquí dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-responsive">
+      <table id="tablaSobrantes" class="table sobrantes-table">
+        <thead>
+          <tr>
+            <th>Equipos Sobrantes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Los equipos sobrantes se agregarán aquí dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="form-group text-center">
+      <button class="btn btn-danger" onclick="reiniciar()">Reiniciar</button>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    var equiposChampios = [
+      "AJAX",
+      "LIVERPOOL",
+      "NAPOLI FC",
+      "RANGERS",
+      "FC PORTO",
+      "AT. MADRID",
+      "LEVERKUSEN",
+      "BRUJAS KV",
+      "FC BAYERN",
+      "BARCA",
+      "INTER",
+      "PLZEN",
+      "FRANKFURT",
+      "SPURS",
+      "SPORTING",
+      "MARSELLA",
+      "MILAN",
+      "CHELSEA",
+      "SALZBURGO",
+      "D.ZAGREB",
+      "R. MADRID",
+      "RB LEIPZIG",
+      "SHAKHTAR",
+      "CELTIC",
+      "MAN CITY",
+      "SEVILLA",
+      "DORMUND",
+      "KOBENHVN",
+      "PSG",
+      "JUVENTUS",
+      "SL BENFICA",
+      "SAN GALO"
+    ];
+
+    var equiposMundial =  [
+    "CATAR",
+    "ECUADOR",
+    "SENEGAL",
+    "P.BAJOS",
+    "INGLATERRA",
+    "RI IRAN",
+    "EUA",
+    "GALES",
+    "ARGENTINA",
+    "ARABIA SAUDITA",
+    "MEXICO",
+    "POLONIA",
+    "FRANCIA",
+    "AUSTRALIA",
+    "DINAMARCA",
+    "TUNEZ",
+    "ESPAÑA",
+    "COSTA RICA",
+    "ALEMANIA",
+    "JAPON",
+    "BELGICA",
+    "CANADA",
+    "MARRUECOS",
+    "CROACIA",
+    "BRASIL",
+    "SERBIA",
+    "SUIZA",
+    "CAMERUN",
+    "PORTUGAL",
+    "GHANA",
+    "URUGUAY",
+    "COREA SUR"
+  ];
+
+    function cargarDatos(tipoTorneo) {
+      var listaEquipos;
+
+      if (tipoTorneo === 'champios') {
+        listaEquipos = equiposChampios;
+      } else if (tipoTorneo === 'mundial') {
+        listaEquipos = equiposMundial;
+      }
+
+      document.getElementById('numJugadores').value = listaEquipos.length;
+      equiposChampios = listaEquipos;
+    }
+
+    function generarEquipos() {
+      var numJugadores = parseInt(document.getElementById('numJugadores').value);
+      var equiposPorJugador = Math.floor(equiposChampios.length / numJugadores);
+      var equiposSobrantes = equiposChampios.length % numJugadores;
+      var nombresJugadores = document.getElementById('nombresJugadores').value.split(',');
+
+      // Validar que se hayan ingresado suficientes nombres de jugadores
+      if (nombresJugadores.length < numJugadores) {
+        alert('Ingresa al menos ' + numJugadores + ' nombres de jugadores');
+        return;
+      }
+
+      // Obtener una copia aleatoria de la lista de equipos
+      var equiposAleatorios = equiposChampios.slice().sort(function() {
+        return 0.5 - Math.random();
+      });
+
+      // Reiniciar las tablas
+      document.getElementById('tablaEquipos').getElementsByTagName('tbody')[0].innerHTML = '';
+      document.getElementById('tablaSobrantes').getElementsByTagName('tbody')[0].innerHTML = '';
+
+      for (var i = 0; i < numJugadores; i++) {
+        var jugador = nombresJugadores[i].trim() !== '' ? nombresJugadores[i].trim() : 'Jugador ' + (i + 1);
+        var equiposAsignados = equiposAleatorios.slice(i * equiposPorJugador, (i * equiposPorJugador) + equiposPorJugador);
+
+        var row = document.createElement('tr');
+        var equiposHTML = equiposAsignados.map(function(equipo) {
+          return '<td>' + equipo + '</td>';
+        }).join('');
+        row.innerHTML = '<td>' + jugador + '</td>' + equiposHTML;
+        document.getElementById('tablaEquipos').getElementsByTagName('tbody')[0].appendChild(row);
+      }
+
+      // Mostrar equipos sobrantes si los hay
+      if (equiposSobrantes > 0) {
+        var equiposSobrantesHTML = equiposAleatorios.slice(numJugadores * equiposPorJugador);
+        var sobrantesRow = document.createElement('tr');
+        var sobrantesHTML = equiposSobrantesHTML.map(function(equipo) {
+          return '<td>' + equipo + '</td>';
+        }).join('');
+        sobrantesRow.innerHTML = sobrantesHTML;
+        document.getElementById('tablaSobrantes').getElementsByTagName('tbody')[0].appendChild(sobrantesRow);
+      }
+    }
+
+    function reiniciar() {
+      document.getElementById('numJugadores').value = '';
+      document.getElementById('nombresJugadores').value = '';
+      document.getElementById('tablaEquipos').getElementsByTagName('tbody')[0].innerHTML = '';
+      document.getElementById('tablaSobrantes').getElementsByTagName('tbody')[0].innerHTML = '';
+    }
+  </script>
+</body>
+</html>
